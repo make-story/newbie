@@ -16,22 +16,6 @@ router.all('/newbie', (request, response, next) => {
 	let nouns = [];
 	let text = [];
 
-	/*
-	{
-		"token":"KGWL2RmeR0cwNFnROZjaACzD2HldT0nwwZHmtFhiFzd5Jr559hlcN4pIPPI9qxIY",
-		"channel_id":"10356",
-		"channel_type":"1",
-		"channel_name":"UIT_Newbie",
-		"user_id":"477",
-		"username":"ysm0203",
-		"post_id":"44478681317416",
-		"thread_id":"0",
-		"timestamp":"1600330126071",
-		"text":"뉴비 뉴비",
-		"trigger_word":"뉴비"
-	}
-	*/
-
 	// 로그 쓰기
 	try {
 		const pathLog = path.resolve(__dirname, "../logs/synology.log");
@@ -63,29 +47,18 @@ router.all('/newbie', (request, response, next) => {
 });
 
 router.all('/newbie/outgoing', (request, response, next) => {
-	/*const body = {
-		"token":"KGWL2RmeR0cwNFnROZjaACzD2HldT0nwwZHmtFhiFzd5Jr559hlcN4pIPPI9qxIY",
-		"channel_id":"10356",
-		"channel_type":"1",
-		"channel_name":"UIT_Newbie",
-		"user_id":"477",
-		"username":"ysm0203",
-		"post_id":"44478681317416",
-		"thread_id":"0",
-		"timestamp":"1600330126071",
-		"text":"뉴비 뉴비",
-		"trigger_word":"뉴비"
-	};
+	/*
 	(async () => {
 		await axios({
 			method: 'post',
-			url: 'https://chat.cjoshopping.com/webapi/entry.cgi?api=SYNO.Chat.External&method=incoming&version=2&token=%22kN5NKyktiY4WkzbnKnOVjTsdxO8rzR4DLIEMPc6zowiPWfcBhwpOTv06rDi6ZsCa%22',
+			url: '',
 			//headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 			headers: {'Content-Type': 'application/json'},
 			data: `payload=${JSON.stringify({})}`,
 		});
 		response.end('TEST');
-	})();*/
+	})();
+	*/
 });
 
 module.exports = router;
