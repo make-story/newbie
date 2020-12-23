@@ -10,8 +10,8 @@ const https = require('https');
 const express = require('express');
 //const cors = require('cors');
 //const cookieParser = require('cookie-parser');
-const env = require(path.resolve(__dirname, './config/env'));
-const mongodb = require(path.resolve(__dirname, './databases/mongodb'));
+const env = require(path.resolve(__dirname, '../config/env'));
+const mongodb = require(path.resolve(__dirname, '../databases/mongodb'));
 
 // express app
 const app = express();
@@ -24,11 +24,15 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 
 // 템플릿 
 app.set('view engine', 'ejs'); // 사용할 템플릿 설정
-app.set('views', __dirname + '/view'); // view 관련 파일이 모여있는 폴더 경로
+app.set('views', path.resolve(__dirname, '../pages')); // view 관련 파일이 모여있는 폴더 경로
 app.engine('html', require('ejs').renderFile); // html 에서 ejs 사용가능하도록 설정
 
 // 이미지, CSS 파일 및 JavaScript 파일과 같은 정적 파일 경로 설정
-app.use(express.static('static'));
+// app.use(express.static('../경로'))) 했을 경우, $ yarn server 을 실행시키는 명령은 root 이므로, root 기준 상대경로가 설정됨
+// app.use(express.static(path.resolve(__dirname, '../경로')))
+app.use(express.static(path.resolve(__dirname, '../dist')));
+app.use(express.static(path.resolve(__dirname, '../public')));
+app.use(express.static(path.resolve(__dirname, '../test')));
 
 // mongodb 연결 
 mongodb.connect();
@@ -48,10 +52,10 @@ mongodb.connect();
 });*/
 
 // 라우터
-app.use('/', require('./routers/global'));
-app.use('/test', require('./routers/test'));
-app.use('/api', require('./routers/api'));
-app.use('/synology', require('./routers/synology'));
+app.use('/', require('../routers/global'));
+//app.use('/test', require('../routers/test'));
+app.use('/api', require('../routers/api'));
+//app.use('/synology', require('../routers/synology'));
 
 // 서버 실행
 //app.listen(env.port, () => console.log(`app is working at http://localhost:${env.port}`));
@@ -59,7 +63,7 @@ const httpServer = http.createServer(app);
 httpServer.listen(env.port, () => {
 	console.log('Newbie Server', env.port);
 });
-if(fs.existsSync(path.resolve(__dirname, '../.key/ssl.json'))) {
+/*if(fs.existsSync(path.resolve(__dirname, '../.key/ssl.json'))) {
 	const ssl = require(path.resolve(__dirname, '../.key/ssl.json'));
 	if(ssl && typeof ssl === 'object' && fs.existsSync(ssl.pathKey) && fs.existsSync(ssl.pathCert)) {
 		const credentials = {
@@ -71,4 +75,4 @@ if(fs.existsSync(path.resolve(__dirname, '../.key/ssl.json'))) {
 			console.log('Newbie Server SSL', env.portSSL);
 		});
 	}
-}
+}*/

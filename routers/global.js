@@ -3,10 +3,10 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', function(request, response) {
-    response.render('index.html');
+	response.render('index.html');
 });
 router.get('/detail', function(request, response) {
-    response.render('detail.html');
+	response.render('detail.html');
 });
 
 module.exports = router;

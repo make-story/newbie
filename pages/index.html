@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<title>newbie</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="/css/style.css" />
+</head>
+<body>
+	<%='test'%>
+<div class="wrap">
+	<header>
+		<h1>newbie</h1>
+		<p>make a scenario</p>
+	</header>
+	<div class="contents">
+		<div class="scenario_list"></div>
+		<div class="btn_wrap"><button type="button" class="btn_new">시나리오 만들기</button></div>
+		<!-- 새 시나리오 작성 -->
+		<div class="new_scenario">
+			<dl>
+				<dt><input type="text" class="title_scenario" placeholder="시나리오 제목" title="시나리오 제목"></dt>
+				<dd class="tag_input_wrapper">
+					<input type="text" class="tag_input" placeholder="단어 입력 후 스페이스" title="태그를 입력하세요" />
+					<div class="tag_wrapper"></div>
+				</dd>
+			</dl>
+			<button type="button" class="btn_save">시나리오 저장</button>
+		</div>
+		<!-- //새 시나리오 작성 -->
+	</div>
+</div>
+
+<script type="text/javascript">
+	const tagInput = document.querySelector('.tag_input');
+	const newForm = document.querySelector('.tag_input_wrapper');
+	const saveBtn = document.querySelector('.btn_save');
+	const tagView = document.querySelector('.tag_wrapper');
+	const scenarioList = document.querySelector('.scenario_list');
+	const scenarioTitle = document.querySelector('.title_scenario');
+	const newSenarioArea = document.querySelector('.new_scenario');
+	const newBtn = document.querySelector('.btn_new');
+	const SCENARIO_LS = 'scenarios';
+
+	//새 시나리오 작성 버튼 	
+	newBtn.addEventListener('click', () => {
+		if (!newSenarioArea.classList.contains('show')) {
+			newSenarioArea.classList.add('show');
+		}
+		newSenario();
+	});
+	
+	function deleteTag() {
+		//지우기
+		this.parentElement.remove();
+	}
+	
+	function makeTag(text) {
+		//태그만들기
+		const tag = document.createElement('span');
+		tag.classList.add('tag');
+		tag.setAttribute('draggable', true);
+		//지우기 버튼 만들기
+		const delBtn = document.createElement('button');
+		delBtn.classList.add('btn_del');
+		delBtn.setAttribute('type', 'button');
+		delBtn.innerHTML = 'X';
+		delBtn.addEventListener('click', deleteTag);
+		//tag 내용
+		tag.innerHTML = `<span class="tag_inner">${text}</span>`;
+		tagView.appendChild(tag);
+		tag.append(delBtn);
+		//draggable
+		tag.addEventListener('dragstart', () => {
+			tag.classList.add('dragging');
+		});
+		tag.addEventListener('dragend', () => {
+			tag.classList.remove('dragging');
+		});
+		tagView.addEventListener('dragover', e => {
+			e.preventDefault;
+			const afterElement = getDragAfterElement(tagView, e.clientX);
+			const draggable = document.querySelector('.dragging');
+			// after element 가 positive라 undefind면 제일 뒤에 append
+			if (afterElement == null ) {
+				tagView.appendChild(draggable);
+			} else {
+				tagView.insertBefore(draggable, afterElement);
+			}
+		});
+	}
+	//드래그 위치 계산
+	function getDragAfterElement(tagView, x){
+		// 드래그 하는 자신 말고 다른 모드 드래그 가능한 elements
+		const draggableElement = [...tagView.querySelectorAll('.tag:not(.dragging)') ]
+		
+		return draggableElement.reduce((closest, child) => {
+			const box = child.getBoundingClientRect();
+			const offset = x - box.left - box.width / 2 // offset은 마우스 x 포지션 - 박스 left 값 - 박스 가로길이 /2 (가운데 값)
+			//console.log(offset);
+			// element가 왼쪽으로 가면 negative, 오른쪽으로 가면 positive
+			// element 가 positive만 있으면 마지막에 append이므로 negative값만 체크 
+			// negative면서 가장 0에 가까운 값을 체크
+			if( offset < 0 && offset > closest.offset) {
+				return { offset : offset , element : child }
+			} else {
+				return closest
+			}
+		} , { offset : Number.NEGATIVE_INFINITY } ).element
+		//  offset : Number.NEGATIVE_INFINITY : 최초 closest 값은 negative_infinity 
+		// draggableElement 전체를 return 할 때 element 로 return
+	}
+	
+	//시나리오 작성하기 
+	function newSenario() {
+		//새 시나리오 작성
+		//태그 적기	
+		newForm.addEventListener('keyup', function (e) {
+			if (e.keyCode == 0 || e.keyCode == 32) {
+				const currentValue = tagInput.value;
+				makeTag(currentValue);
+				tagInput.value = '';
+			}
+		});
+		//시나리오 작성 후 저장
+		saveBtn.addEventListener('click', function(){
+			const tagInner = document.querySelectorAll('.tag_inner');
+			const title = scenarioTitle.value;
+			const contents = [];
+			tagInner.forEach(element => contents.push(element.innerText));
+			//console.log(contents);
+			const lists = JSON.parse(localStorage.getItem(SCENARIO_LS));
+			//처음 타이틀 저장된 게 없을 때 empty array 를 저장.
+			if (!lists){
+				const scenarioContents = [];
+				scenarioContents.push({
+					title : title,
+					contents : contents
+				});
+				localStorage.setItem(SCENARIO_LS , JSON.stringify(scenarioContents));
+			} else {
+				//저장된 리스트 있으면 추가로 
+				lists.push({
+					title : title,
+					contents : contents
+				});
+				localStorage.setItem(SCENARIO_LS , JSON.stringify(lists));
+			}
+			scenarioTitle.value = '';
+			tagView.innerHTML = '';
+		});
+	}
+	
+	function showSenario() {
+		if (localStorage.getItem(SCENARIO_LS) != null) {
+			//로컬 스토리지에 내용 있으면	
+			const senarioLists = JSON.parse(localStorage.getItem(SCENARIO_LS));
+			//list ul 만들기
+			const listWrapper = document.createElement('ul');
+			scenarioList.appendChild(listWrapper);
+			//시나리오 수정
+			function editSenario(e) {
+				const btn = e.target;
+				const editList = e.target.parentElement;
+				const title = editList.querySelector('.title');
+				const contents = editList.querySelector('.scenario');
+				const titleValue = title.innerText;
+				title.innerHTML = `<input type="text" value="${titleValue}">`;
+				//contents tag형태로 바꾸기 
+				btn.innerText = '저장';
+				btn.classList.add('save');
+				//btn.addEventListener('click', saveSenario); 로컬 스토리지에 저장하기 
+			}
+			//시나리오 삭제 
+			function deleteSenario(e){
+				const editList = e.target.parentElement;
+				editList.remove();
+				//로컬스토리지에서 삭제하기
+				//번호 바꾸기? 
+			}
+			//li 만들기
+			senarioLists.forEach((element, index) => {
+				const listItem = document.createElement('li');
+				const listNum = document.createElement('span');
+				const editThis = document.createElement('button');
+				const deleteThis = document.createElement('button');
+				listNum.classList.add('no');
+				listNum.innerText = index + 1;
+				const title = document.createElement('strong');
+				title.classList.add('title');
+				title.innerText = senarioLists[index].title;
+
+				const contents = document.createElement('span');
+				contents.classList.add('scenario');
+				contents.innerText =senarioLists[index].contents;
+
+				editThis.classList.add('btn_edit');
+				editThis.innerText = '수정';
+				deleteThis.classList.add('btn_delete');
+				deleteThis.innerText = '삭제';
+
+				listItem.appendChild(listNum);
+				listItem.appendChild(title);
+				listItem.appendChild(contents);
+				listItem.appendChild(editThis);
+				listItem.appendChild(deleteThis);
+				listWrapper.appendChild(listItem);
+
+				//시나리오 수정 버튼 
+				editThis.addEventListener('click', editSenario);
+				//시나리오 삭제 버튼
+				deleteThis.addEventListener('click', deleteSenario);
+			});
+		} else {
+			//없으면 없다고 뿌려주기 
+			scenarioList.innerHTML = `<p class="no_scenario">저장된 시나리오가 없습니다.</p>`;
+			newBtn.style.display = 'none';
+			//없을 때 새 시나리오 적는 폼 노출
+			newSenarioArea.classList.add('show');
+			newSenario();
+		}
+	}
+
+	function init() {
+		showSenario();	
+	}
+	init();
+</script>
+</body>
+</html>
