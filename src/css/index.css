@@ -1,0 +1,36 @@
+.move {
+	cursor: move;
+	width: 30px;
+	height: 30px;
+	position: relative;
+	top: 10px;
+	left: 10px;
+	background-color: #CCC;
+}
+
+/* 선택가능한 상태로부터 드래그 가능한 텍스트 컨텐츠를 방지 */
+[draggable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.column {
+	height: 50px;
+	width: 50px;
+	float: left;
+	border: 1px solid #666666;
+	text-align: center;
+	cursor: move;
+
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	-webkit-box-shadow: inset 0 0 3px #000;
+	box-shadow: inset 0 0 3px #000;
+}
+
+/* 드래그관련 */
+.column.over {
+	border: 2px dashed #000;
+}
