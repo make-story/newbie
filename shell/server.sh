@@ -4,7 +4,8 @@
 # $ sh shell/server.sh master 빌드번호
 
 #SHELL_PATH=`pwd -P`
-SHELL_PATH="/home/newbie"
+PROJECT_PATH="/home"
+PROJECT_NAME="newbie"
 APP_NAME="Newbie"
 #SOCKET_NAME="Newbie-socket"
 if [ -n "$1" ];
@@ -16,13 +17,13 @@ if [ -n "$1" ];
 	# "branch"
 	if [ "develop" == "$1" ] || [ "origin/develop" == "$1" ];
 		then
-		SHELL_PATH=$SHELL_PATH/webpagetest.test
+		PROJECT_PATH=$PROJECT_PATH/$PROJECT_NAME.test
 		APP_NAME=$APP_NAME-develop
 		#SOCKET_NAME=$SOCKET_NAME-develop
 		source ./env/test.env; 
 	elif [ "master" == "$1" ] || [ "origin/master" == "$1" ];
 		then
-		SHELL_PATH=$SHELL_PATH/webpagetest
+		PROJECT_PATH=$PROJECT_PATH/$PROJECT_NAME
 		APP_NAME=$APP_NAME-master
 		#SOCKET_NAME=$SOCKET_NAME-master
 		source ./env/production.env;
@@ -41,21 +42,21 @@ if [ -n "$1" ];
 		# "awk '{print $2}' 위에서 검색된 줄에서 2번째 항목(PID) 출력."
 	#	kill -9 "$PID"
 	#fi
-	PM2=`$SHELL_PATH/node_modules/pm2/bin/pm2 list | grep "$APP_NAME" | awk '{print $4}'`
+	PM2=`$PROJECT_PATH/node_modules/pm2/bin/pm2 list | grep "$APP_NAME" | awk '{print $4}'`
 	if [ -n "$PM2" ];
 		then
-		$SHELL_PATH/node_modules/pm2/bin/pm2 delete "$PM2"
+		$PROJECT_PATH/node_modules/pm2/bin/pm2 delete "$PM2"
 	fi
-	#PM2=`$SHELL_PATH/node_modules/pm2/bin/pm2 list | grep "$SOCKET_NAME" | awk '{print $4}'`
+	#PM2=`$PROJECT_PATH/node_modules/pm2/bin/pm2 list | grep "$SOCKET_NAME" | awk '{print $4}'`
 	#if [ -n "$PM2" ];
 		#then
-		#$SHELL_PATH/node_modules/pm2/bin/pm2 delete "$PM2"
+		#$PROJECT_PATH/node_modules/pm2/bin/pm2 delete "$PM2"
 	#fi
 
 	# "node start"
 	#BUILD_ID=dontKillMe ACTIVE=test BUILD_NUMBER=${BUILD} nohup node servers/main.js &
-	$SHELL_PATH/node_modules/pm2/bin/pm2 start $SHELL_PATH/servers/main.js --name "$APP_NAME"
-	#$SHELL_PATH/node_modules/pm2/bin/pm2 start $SHELL_PATH/servers/websocket.js --name "$SOCKET_NAME"
+	$PROJECT_PATH/node_modules/pm2/bin/pm2 start $PROJECT_PATH/servers/main.js --name "$APP_NAME"
+	#$PROJECT_PATH/node_modules/pm2/bin/pm2 start $PROJECT_PATH/servers/websocket.js --name "$SOCKET_NAME"
 
 	# 설정값 초기화(제거)
 	#unset BUILD_NUMBER
