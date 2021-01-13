@@ -30,9 +30,9 @@ app.engine('html', require('ejs').renderFile); // html 에서 ejs 사용가능�
 // 이미지, CSS 파일 및 JavaScript 파일과 같은 정적 파일 경로 설정
 // app.use(express.static('../경로'))) 했을 경우, $ yarn server 을 실행시키는 명령은 root 이므로, root 기준 상대경로가 설정됨
 // app.use(express.static(path.resolve(__dirname, '../경로')))
+app.use('/test', express.static(path.resolve(__dirname, '../test')));
 app.use(express.static(path.resolve(__dirname, '../dist')));
 app.use(express.static(path.resolve(__dirname, '../public')));
-app.use(express.static(path.resolve(__dirname, '../test')));
 
 // mongodb 연결 
 mongodb.connect();
